@@ -1,0 +1,6 @@
+pawn/linux/getch.o
+pawn/amx/amx.o
+pawn/amx/amxaux.o
+pawn/amx/amxcore.o
+pawn/amx/amxcons.o
+amxwrap.o

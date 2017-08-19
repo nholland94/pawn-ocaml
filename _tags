@@ -1,0 +1,4 @@
+<amxwrap.*> or <pawn/**/*>: include_pawn_amx
+<pawn.*>: use_amxwrap, package(ppx_deriving.std)
+<examples/*> or <pawn.*>: package(ppx_deriving), package(result), package(ctypes.foreign)
+<examples/*>: use_pawn
