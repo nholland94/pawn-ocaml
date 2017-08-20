@@ -27,6 +27,6 @@ let () =
   List.iteri (Printf.printf "%d - %s\n") natives;
 
   print_endline "### Publics:";
-  List.iteri (fun i (name, addr) -> Printf.printf "%d - %s\n:%08nx" i name addr) publics;
+  List.iteri (fun i (name, addr) -> Printf.printf "%d - %s:0x%08nx\n" i name addr) publics;
 
   check_err (AUX.free_program amx)

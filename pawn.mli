@@ -4,8 +4,6 @@ open Result
 module Util : sig
   val (|@>) : ('a, 'b) result -> ('a -> ('c, 'b) result) -> ('c, 'b) result
   val (|@*>) : ('a, 'b) result -> ('a -> 'c) -> ('c, 'b) result
-
-  val lift_null_term_string : string -> string
 end
 
 module AMX : sig

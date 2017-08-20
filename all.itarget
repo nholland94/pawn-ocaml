@@ -1,1 +1,3 @@
-pawn.cmx pawn.cmxa
+lib.otarget
+examples.otarget
+test_files.otarget

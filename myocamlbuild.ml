@@ -9,21 +9,28 @@ let find_headers dir =
 
 let () =
   dispatch (function
+    | Before_rules ->
+        (* pawncc rule *)
+        rule "%.p -> %.amx"
+          ~prod:"%.amx"
+          ~dep:"%.p"
+          (fun env _build ->
+            let source = env "%.p" in
+            let target = env "%.amx" in
+            Cmd (S [A "pawncc"; P source; A ("-o" ^ target)]))
     | After_rules ->
+        (* include_pawn, use_pawn *)
         ocaml_lib "pawn";
 
+        (* use_amxwrap *)
         dep ["link"; "ocaml"; "use_amxwrap"] ["libamxwrap.a"];
         flag ["link"; "library"; "ocaml"; "byte"; "use_amxwrap"]
           (S [A "-dllib"; A "-lamxwrap"; A "-cclib"; A "-lamxwrap"]);
         flag ["link"; "library"; "ocaml"; "native"; "use_amxwrap"]
           (S [A "-cclib"; A "-lamxwrap"]);
 
+        (* include_pawn_amx *)
         dep ["c"; "compile"; "include_pawn_amx"] (find_headers "pawn/amx" @ find_headers "pawn/linux");
         flag ["c"; "compile"; "include_pawn_amx"]
-          (S [A "-ccopt"; A "-Ipawn/amx"; A "-ccopt"; A "-Ipawn/linux"]);
-
-        flag ["link"; "library"; "ocaml"; "byte"; "use_libdl"]
-          (S [A "-dllib"; A "-ldl"; A "-cclib"; A "-ldl"]);
-        flag ["link"; "library"; "ocaml"; "native"; "use_libdl"]
-          (S [A "-cclib"; A "-ldl"])
+          (S [A "-ccopt"; A "-Ipawn/amx"; A "-ccopt"; A "-Ipawn/linux"])
     | _ -> ())

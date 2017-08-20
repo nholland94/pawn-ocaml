@@ -10,18 +10,6 @@ module Util = struct
   let (|@*>) = function
     | Ok v           -> (fun f -> Ok (f v))
     | Error _ as err -> (fun _ -> err)
-
-  let lift_null_term_string buf =
-    let len = String.length buf in
-    let rec loop i =
-      if i = len then
-        raise (Invalid_argument "lift_null_term_string: no null term in buf")
-      else if String.get buf i = Char.chr 0 then
-        String.sub buf 0 i
-      else
-        loop (i + 1)
-    in
-    loop 0
 end
 
 module AMX = struct
@@ -87,8 +75,8 @@ module AMX = struct
   module Raw = struct
     let find_native = foreign "amx_FindNative" (t @-> string @-> ptr native_index @-> returning error)
     let find_public = foreign "amx_FindPublic" (t @-> string @-> ptr public_index @-> returning error)
-    let get_native = foreign "amx_GetNative" (t @-> int @-> string @-> returning error)
-    let get_public = foreign "amx_GetPublic" (t @-> int @-> string @-> ptr cell @-> returning error)
+    let get_native = foreign "amx_GetNative" (t @-> int @-> ptr char @-> returning error)
+    let get_public = foreign "amx_GetPublic" (t @-> int @-> ptr char @-> ptr cell @-> returning error)
     let num_natives = foreign "amx_NumNatives" (t @-> ptr int @-> returning error)
     let num_publics = foreign "amx_NumPublics" (t @-> ptr int @-> returning error)
     let push = foreign "amx_Push" (t @-> cell @-> returning error)
@@ -103,12 +91,12 @@ module AMX = struct
     error_result (Raw.find_public amx name index_ptr) (fun () -> !@index_ptr)
 
   let get_native amx index =
-    let name_buf = Bytes.to_string (Bytes.create 256) in
-    error_result (Raw.get_native amx index name_buf) (fun () -> lift_null_term_string name_buf)
+    let name_buf = Ctypes.allocate_n char ~count:256 in
+    error_result (Raw.get_native amx index name_buf) (fun () -> coerce (ptr char) string name_buf)
   let get_public amx index =
-    let name_buf = Bytes.to_string (Bytes.create 256) in
+    let name_buf = Ctypes.allocate_n char ~count:256 in
     let addr_ptr = allocate cell 0n in
-    error_result (Raw.get_public amx index name_buf addr_ptr) (fun () -> (lift_null_term_string name_buf, !@addr_ptr))
+    error_result (Raw.get_public amx index name_buf addr_ptr) (fun () -> (coerce (ptr char) string name_buf, !@addr_ptr))
 
   let num_natives amx =
     let num_ptr = allocate int 0 in

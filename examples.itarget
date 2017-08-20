@@ -1,2 +1,4 @@
-all.otarget
+lib.otarget
 examples/simple.byte
+examples/enumerate.byte
+examples/pawn_test_runner.byte

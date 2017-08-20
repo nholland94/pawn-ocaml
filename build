@@ -1,0 +1,18 @@
+#!/bin/sh
+
+TARGET=$([ -n "$1" ] && echo "$1" || echo "all.otarget") 
+
+set -x
+
+build() {
+  ocamlbuild \
+    -no-links \
+    -no-hygiene \
+    -use-ocamlfind \
+    "$1"
+}
+
+case $TARGET in
+  clean) ocamlbuild -clean;;
+      *) build $TARGET;;
+esac
